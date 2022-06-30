@@ -28,11 +28,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.kauailabs.navx.frc.AHRS;
-// import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.math.controller.PIDController;
-// import edu.wpi.first.wpilibj.SPI;
-// import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.math.MathUtil;
 
 public class Robot extends TimedRobot {
   
@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
   final double armHoldUp = 0.08;
   final double armHoldDown = 0.13;
   final double armTravel = 0.5;
-  final double armTimeUp = 0.6;
+  final double armTimeUp = 0.55;
   final double armTimeDown = 0.35;
 
   //Varibles needed for the 
@@ -111,23 +111,23 @@ public class Robot extends TimedRobot {
     CameraServer.startAutomaticCapture();
 
     // PID for turns in Auto
-    // try {
-    //   /***********************************************************************
-    //    * navX-MXP: - Communication via RoboRIO MXP (SPI, I2C) and USB. - See
-    //    * http://navx-mxp.kauailabs.com/guidance/selecting-an-interface.
-    //    * 
-    //    * navX-Micro: - Communication via I2C (RoboRIO MXP or Onboard) and USB. - See
-    //    * http://navx-micro.kauailabs.com/guidance/selecting-an-interface.
-    //    * 
-    //    * VMX-pi: - Communication via USB. - See
-    //    * https://vmx-pi.kauailabs.com/installation/roborio-installation/
-    //    * 
-    //    * Multiple navX-model devices on a single robot are supported.
-    //    ************************************************************************/
-    //   ahrs = new AHRS(SPI.Port.kMXP);
-    // } catch (RuntimeException ex) {
-    //   DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
-    // }
+    try {
+      /***********************************************************************
+       * navX-MXP: - Communication via RoboRIO MXP (SPI, I2C) and USB. - See
+       * http://navx-mxp.kauailabs.com/guidance/selecting-an-interface.
+       * 
+       * navX-Micro: - Communication via I2C (RoboRIO MXP or Onboard) and USB. - See
+       * http://navx-micro.kauailabs.com/guidance/selecting-an-interface.
+       * 
+       * VMX-pi: - Communication via USB. - See
+       * https://vmx-pi.kauailabs.com/installation/roborio-installation/
+       * 
+       * Multiple navX-model devices on a single robot are supported.
+       ************************************************************************/
+      ahrs = new AHRS(SPI.Port.kMXP);
+    } catch (RuntimeException ex) {
+      DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
+    }
     // turnController = new PIDController(kP, kI, kD);
     // turnController.enableContinuousInput(-180.0f, 180.0f);
 
@@ -199,83 +199,107 @@ public class Robot extends TimedRobot {
     switch((int)numBallsAuto)
     {
       case 0:
-        driveLeftA.set(ControlMode.PercentOutput,0);
-        driveLeftB.set(ControlMode.PercentOutput,0);
-        driveRightA.set(ControlMode.PercentOutput,0);
-        driveRightB.set(ControlMode.PercentOutput,0);
+
+        if(autoTimeElapsed < 2)
+        {
+          driveLeftA.set(ControlMode.PercentOutput,0.4);
+        driveLeftB.set(ControlMode.PercentOutput,0.4);
+        driveRightA.set(ControlMode.PercentOutput,0.4);
+        driveRightB.set(ControlMode.PercentOutput,0.4);
+        }
+        else
+        {
+          driveLeftA.set(ControlMode.PercentOutput,0);
+          driveLeftB.set(ControlMode.PercentOutput,0);
+          driveRightA.set(ControlMode.PercentOutput,0);
+          driveRightB.set(ControlMode.PercentOutput,0);
+        }
+        
         break;
       case 1:
         if(autoTimeElapsed < 2)
         {
           intake.set(ControlMode.PercentOutput, -1);
         }
+        else if(autoTimeElapsed < 4)
+        {
+          driveLeftA.set(ControlMode.PercentOutput,0.4);
+          driveLeftB.set(ControlMode.PercentOutput,0.4);
+          driveRightA.set(ControlMode.PercentOutput,0.4);
+          driveRightB.set(ControlMode.PercentOutput,0.4);
+          intake.set(ControlMode.PercentOutput, 0);
+        }
+        else
+        {
+          driveLeftA.set(ControlMode.PercentOutput,0);
+          driveLeftB.set(ControlMode.PercentOutput,0);
+          driveRightA.set(ControlMode.PercentOutput,0);
+          driveRightB.set(ControlMode.PercentOutput,0);
+        }
         break;
       case 2:
-        if(autoTimeElapsed < 2)
+        if(autoTimeElapsed < 1)
         {
           intake.set(ControlMode.PercentOutput, -1);
         }
-        else if (autoTimeElapsed < 3)
+        else if (autoTimeElapsed < 2)
         {
-          driveLeftA.set(ControlMode.PercentOutput,0.3);
-          driveLeftB.set(ControlMode.PercentOutput,0.3);
-          driveRightA.set(ControlMode.PercentOutput,0.3);
-          driveRightB.set(ControlMode.PercentOutput,0.3);
+          driveLeftA.set(ControlMode.PercentOutput,0.4);
+          driveLeftB.set(ControlMode.PercentOutput,0.4);
+          driveRightA.set(ControlMode.PercentOutput,0.4);
+          driveRightB.set(ControlMode.PercentOutput,0.4);
         }
-        else if(flag && ahrs.getAngle() < 160)
+        else if(flag && ahrs.getAngle() < 145)
         {
           //turnController.setSetpoint(179.9f);
-          driveLeftA.set(ControlMode.PercentOutput,-0.3);
-          driveLeftB.set(ControlMode.PercentOutput,-0.3);
-          driveRightA.set(ControlMode.PercentOutput,0.3);
-          driveRightB.set(ControlMode.PercentOutput,0.3);
+          intake.set(ControlMode.PercentOutput, 0);
+          driveLeftA.set(ControlMode.PercentOutput,-0.35);
+          driveLeftB.set(ControlMode.PercentOutput,-0.35);
+          driveRightA.set(ControlMode.PercentOutput,0.35);
+          driveRightB.set(ControlMode.PercentOutput,0.35);
+          armUp = false;
           flag = false;
           flag2 = true;
           //double currentRotationRate = MathUtil.clamp(turnController.calculate(ahrs.getAngle()), -1.0, 1.0);
         }
-        else if (flag2)
-        {
-          driveLeftA.set(ControlMode.PercentOutput,0);
-          driveLeftB.set(ControlMode.PercentOutput,0);
-          driveRightA.set(ControlMode.PercentOutput,0);
-          driveRightB.set(ControlMode.PercentOutput,0);
-          intake.set(ControlMode.PercentOutput, 0);
-          armUp = false;
-          flag2 = false;
-        }
-        else if(!flag && autoTimeElapsed < 3.5)
-        {
-          intake.set(ControlMode.PercentOutput, 1);
-          driveLeftA.set(ControlMode.PercentOutput,0.3);
-          driveLeftB.set(ControlMode.PercentOutput,0.3);
-          driveRightA.set(ControlMode.PercentOutput,0.3);
-          driveRightB.set(ControlMode.PercentOutput,0.3);
-        }
-        else if(autoTimeElapsed < 4)
-        {
-          driveLeftA.set(ControlMode.PercentOutput,0);
-          driveLeftB.set(ControlMode.PercentOutput,0);
-          driveRightA.set(ControlMode.PercentOutput,0);
-          driveRightB.set(ControlMode.PercentOutput,0);
-          armUp = true;
-        }
-        else if(autoTimeElapsed < 4.75 && ahrs.getAngle() > 10)
-        {
-          //turnController.setSetpoint(179.9f);
-          driveLeftA.set(ControlMode.PercentOutput,0.3);
-          driveLeftB.set(ControlMode.PercentOutput,0.3);
-          driveRightA.set(ControlMode.PercentOutput,-0.3);
-          driveRightB.set(ControlMode.PercentOutput,-0.3);
-        }
         else if(autoTimeElapsed < 5.5)
         {
+          intake.set(ControlMode.PercentOutput, 1);
+          driveLeftA.set(ControlMode.PercentOutput,-0.5);
+          driveLeftB.set(ControlMode.PercentOutput,-0.5);
+          driveRightA.set(ControlMode.PercentOutput,-0.5);
+          driveRightB.set(ControlMode.PercentOutput,-0.5);
+        }
+        // else if(autoTimeElapsed == 7.5)
+        // {
+        //   driveLeftA.set(ControlMode.PercentOutput,0);
+        //   driveLeftB.set(ControlMode.PercentOutput,0);
+        //   driveRightA.set(ControlMode.PercentOutput,0);
+        //   driveRightB.set(ControlMode.PercentOutput,0);
+        //   armUp = true;
+        // }
+        else if(autoTimeElapsed < 10 && ahrs.getAngle() > -5)
+        {
+          //turnController.setSetpoint(179.9f);
+          armUp = true;
           driveLeftA.set(ControlMode.PercentOutput,0.5);
           driveLeftB.set(ControlMode.PercentOutput,0.5);
-          driveRightA.set(ControlMode.PercentOutput,0.5);
-          driveRightB.set(ControlMode.PercentOutput,0.5);
+          driveRightA.set(ControlMode.PercentOutput,-0.5);
+          driveRightB.set(ControlMode.PercentOutput,-0.5);
         }
-        else if(autoTimeElapsed < 6.5)
+        else if(autoTimeElapsed < 10.5)
         {
+          driveLeftA.set(ControlMode.PercentOutput,-0.4);
+          driveLeftB.set(ControlMode.PercentOutput,-0.4);
+          driveRightA.set(ControlMode.PercentOutput,-0.4);
+          driveRightB.set(ControlMode.PercentOutput,-0.4);
+        }
+        else if(autoTimeElapsed < 12.5)
+        {
+          driveLeftA.set(ControlMode.PercentOutput,0);
+          driveLeftB.set(ControlMode.PercentOutput,0);
+          driveRightA.set(ControlMode.PercentOutput,0);
+          driveRightB.set(ControlMode.PercentOutput,0);
           intake.set(ControlMode.PercentOutput, -1);
         }
         break;
@@ -304,7 +328,7 @@ public class Robot extends TimedRobot {
 
     //Normalized input
     double throttleInput = driverController.getRawAxis(1) * 0.9;
-    double turnInput = driverController.getRawAxis(0) * 0.6;
+    double turnInput = driverController.getRawAxis(4) * 0.6;
     double saturatedInput;
     double greaterInput = Math.max(Math.abs(throttleInput), Math.abs(turnInput));
       //range [0, 1]
@@ -324,8 +348,8 @@ public class Robot extends TimedRobot {
     //such that (throttle + turn) always has a range [-1, 1]
     throttleInput = throttleInput / saturatedInput;
     turnInput = turnInput / saturatedInput;
-		double driveLeftPower = throttleInput + turnInput;
-		double driveRightPower = throttleInput - turnInput;
+		double driveLeftPower = throttleInput - turnInput;
+		double driveRightPower = throttleInput + turnInput;
 
 
     driveLeftA.set(ControlMode.PercentOutput,driveLeftPower);
