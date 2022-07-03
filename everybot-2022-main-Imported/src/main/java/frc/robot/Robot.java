@@ -242,7 +242,7 @@ public class Robot extends TimedRobot {
 
 
       case 2:
-        if(autoTimeElapsed < 1)
+        if(autoTimeElapsed < 0.5)
         {
           armUp = false;
           intake.set(ControlMode.PercentOutput, -1);
@@ -275,7 +275,7 @@ public class Robot extends TimedRobot {
         {
           intake.set(ControlMode.PercentOutput, 1);
         }
-        else if(autoTimeElapsed < 6)
+        else if(autoTimeElapsed < 8)
         {
           driveLeftB.set(ControlMode.PercentOutput,-0.75);
           driveLeftA.set(ControlMode.PercentOutput,-0.75);
