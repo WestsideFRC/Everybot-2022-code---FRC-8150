@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
   /* SmartDashboard in Test mode has support for helping you tune */
   /* controllers by displaying a form where you can enter new P, I, */
   /* and D constants and test the mechanism. */
-  static final double kP = 0.03;
+  static final double kP = 0.3;
   static final double kI = 0.00;
   static final double kD = 0.00;
   static final double kF = 0.00;
@@ -128,6 +128,8 @@ public class Robot extends TimedRobot {
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
     }
+
+
     turnController = new PIDController(kP, kI, kD);
     turnController.enableContinuousInput(-180.0f, 180.0f);
 
@@ -193,8 +195,8 @@ public class Robot extends TimedRobot {
 
     //My Auto
     //double autoTimeElapsed = Timer.getFPGATimestamp() - autoStart;
-    // boolean flag = true;
-    // boolean flag2 = false;
+    boolean flag = false;
+    boolean flag2 = false;
     // double currentRotationRate = MathUtil.clamp(turnController.calculate(ahrs.getAngle()), -1.0, 1.0);
     switch((int)numBallsAuto)
     {
@@ -242,46 +244,92 @@ public class Robot extends TimedRobot {
 
 
       case 2:
-        if(autoTimeElapsed < 0.5)
+        
+        if(autoTimeElapsed < 1.5)
         {
           armUp = false;
-          intake.set(ControlMode.PercentOutput, -1);
+          intake.set(ControlMode.PercentOutput, 1);
         }
         else if (autoTimeElapsed < 2)
         {
-          driveLeftA.set(ControlMode.PercentOutput,0.4);
-          driveLeftB.set(ControlMode.PercentOutput,0.4);
-          driveRightA.set(ControlMode.PercentOutput,0.4);
-          driveRightB.set(ControlMode.PercentOutput,0.4);
+          driveLeftA.set(ControlMode.PercentOutput,-0.4);
+          driveLeftB.set(ControlMode.PercentOutput,-0.4);
+          driveRightA.set(ControlMode.PercentOutput,-0.4);
+          driveRightB.set(ControlMode.PercentOutput,-0.4);
         }
-        else if(autoTimeElapsed < 3)
+        else if(autoTimeElapsed < 5)
         {
           intake.set(ControlMode.PercentOutput, 0);
-          turnController.setSetpoint(180.0f);
-          armUp = false;
+          armUp = true;
+
           // flag = false;
-          // flag2 = true;
+          flag2 = true;
           //double currentRotationRate = MathUtil.clamp(turnController.calculate(ahrs.getAngle()), -1.0, 1.0);
         }
-        else if(autoTimeElapsed < 5.5)
+        if(flag2)
         {
-          // intake.set(ControlMode.PercentOutput, 1);
-          driveLeftA.set(ControlMode.PercentOutput,0.75);
-          driveLeftB.set(ControlMode.PercentOutput,0.75);
-          driveRightA.set(ControlMode.PercentOutput,0.75);
-          driveRightB.set(ControlMode.PercentOutput,0.75);
+
+          while (ahrs.getAngle() < 180-20)
+          {
+              driveLeftA.set(ControlMode.PercentOutput,-0.4);
+              driveLeftB.set(ControlMode.PercentOutput,-0.4);
+              driveRightA.set(ControlMode.PercentOutput,0.4);
+              driveRightB.set(ControlMode.PercentOutput,0.4);
+          }        
+          driveLeftA.set(ControlMode.PercentOutput,0);
+          driveLeftB.set(ControlMode.PercentOutput,0);
+          driveRightA.set(ControlMode.PercentOutput,0);
+          driveRightB.set(ControlMode.PercentOutput,0);
+          armUp = true;
+          flag = true;
         }
-        else if(autoTimeElapsed < 6)
+        if (flag)
         {
-          intake.set(ControlMode.PercentOutput, 1);
+          if(autoTimeElapsed < 10.5)
+          {
+            driveLeftA.set(ControlMode.PercentOutput,0.75);
+            driveLeftB.set(ControlMode.PercentOutput,0.75);
+            driveRightA.set(ControlMode.PercentOutput,0.75);
+            driveRightB.set(ControlMode.PercentOutput,0.75);
+          }
+          else if(autoTimeElapsed < 12)
+          {
+            driveLeftA.set(ControlMode.PercentOutput,0.75);
+            driveLeftB.set(ControlMode.PercentOutput,0.75);
+            driveRightA.set(ControlMode.PercentOutput,0.75);
+            driveRightB.set(ControlMode.PercentOutput,0.75);
+            intake.set(ControlMode.PercentOutput, 1);
+          }
+          else
+          {
+            driveLeftA.set(ControlMode.PercentOutput,-0.75);
+            driveLeftB.set(ControlMode.PercentOutput,-0.75);
+            driveRightA.set(ControlMode.PercentOutput,-0.75);
+            driveRightB.set(ControlMode.PercentOutput,-0.75);
+          }
         }
-        else if(autoTimeElapsed < 8)
-        {
-          driveLeftB.set(ControlMode.PercentOutput,-0.75);
-          driveLeftA.set(ControlMode.PercentOutput,-0.75);
-          driveRightA.set(ControlMode.PercentOutput,-0.75);
-          driveRightB.set(ControlMode.PercentOutput,-0.75);
-        }
+
+
+
+        // else if(autoTimeElapsed < 30000)
+        // {
+        //   // intake.set(ControlMode.PercentOutput, 1);
+        //   driveLeftA.set(ControlMode.PercentOutput,0.75);
+        //   driveLeftB.set(ControlMode.PercentOutput,0.75);
+        //   driveRightA.set(ControlMode.PercentOutput,0.75);
+        //   driveRightB.set(ControlMode.PercentOutput,0.75);
+        // }
+        // else if(autoTimeElapsed < 6)
+        // {
+        //   intake.set(ControlMode.PercentOutput, 1);
+        // }
+        // else if(autoTimeElapsed < 8)
+        // {
+        //   driveLeftB.set(ControlMode.PercentOutput,-0.75);
+        //   driveLeftA.set(ControlMode.PercentOutput,-0.75);
+        //   driveRightA.set(ControlMode.PercentOutput,-0.75);
+        //   driveRightB.set(ControlMode.PercentOutput,-0.75);
+        // }
         // else if(autoTimeElapsed < 10 && ahrs.getAngle() > -5)
         // {
         //   //turnController.setSetpoint(179.9f);
@@ -308,7 +356,26 @@ public class Robot extends TimedRobot {
         // }
         break;
       case 3:
+        // turnController.setSetpoint(100f);
+        // currentRotationRate = MathUtil.clamp(turnController.calculate(ahrs.getAngle()), -1.0, 1.0);
+        
+        // intake.set(ControlMode.PercentOutput, -1);
+        if(ahrs.getAngle() < 180-20)
+        {
+          driveLeftA.set(ControlMode.PercentOutput,-0.4);
+          driveLeftB.set(ControlMode.PercentOutput,-0.4);
+          driveRightA.set(ControlMode.PercentOutput,0.4);
+          driveRightB.set(ControlMode.PercentOutput,0.4);
+        }
+        else
+        {
+          driveLeftA.set(ControlMode.PercentOutput,0);
+          driveLeftB.set(ControlMode.PercentOutput,0);
+          driveRightA.set(ControlMode.PercentOutput,0);
+          driveRightB.set(ControlMode.PercentOutput,0);
+        }
         break;
+
 
 
     }
