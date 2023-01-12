@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
   CANSparkMax arm = new CANSparkMax(5, MotorType.kBrushless);
   TalonSRX intake = new TalonSRX(6);
   Encoder encoder = new Encoder(0, 1);
+  boolean toggle = false; //toggle for intake
 
   Joystick driverController = new Joystick(0);
 
@@ -252,10 +253,10 @@ public class Robot extends TimedRobot {
         }
         else if (autoTimeElapsed < 2)
         {
-          driveLeftA.set(ControlMode.PercentOutput,-0.4);
-          driveLeftB.set(ControlMode.PercentOutput,-0.4);
-          driveRightA.set(ControlMode.PercentOutput,-0.4);
-          driveRightB.set(ControlMode.PercentOutput,-0.4);
+          driveLeftA.set(ControlMode.PercentOutput,-0.3);
+          driveLeftB.set(ControlMode.PercentOutput,-0.3);
+          driveRightA.set(ControlMode.PercentOutput,-0.3);
+          driveRightB.set(ControlMode.PercentOutput,-0.3);
         }
         else if(autoTimeElapsed < 5)
         {
@@ -287,25 +288,25 @@ public class Robot extends TimedRobot {
         {
           if(autoTimeElapsed < 10.5)
           {
-            driveLeftA.set(ControlMode.PercentOutput,0.75);
-            driveLeftB.set(ControlMode.PercentOutput,0.75);
-            driveRightA.set(ControlMode.PercentOutput,0.75);
-            driveRightB.set(ControlMode.PercentOutput,0.75);
+            driveLeftA.set(ControlMode.PercentOutput,-0.75);
+            driveLeftB.set(ControlMode.PercentOutput,-0.75);
+            driveRightA.set(ControlMode.PercentOutput,-0.75);
+            driveRightB.set(ControlMode.PercentOutput,-0.75);
           }
           else if(autoTimeElapsed < 12)
-          {
-            driveLeftA.set(ControlMode.PercentOutput,0.75);
-            driveLeftB.set(ControlMode.PercentOutput,0.75);
-            driveRightA.set(ControlMode.PercentOutput,0.75);
-            driveRightB.set(ControlMode.PercentOutput,0.75);
-            intake.set(ControlMode.PercentOutput, 1);
-          }
-          else
           {
             driveLeftA.set(ControlMode.PercentOutput,-0.75);
             driveLeftB.set(ControlMode.PercentOutput,-0.75);
             driveRightA.set(ControlMode.PercentOutput,-0.75);
             driveRightB.set(ControlMode.PercentOutput,-0.75);
+            intake.set(ControlMode.PercentOutput, 1);
+          }
+          else
+          {
+            driveLeftA.set(ControlMode.PercentOutput,0.75);
+            driveLeftB.set(ControlMode.PercentOutput,0.75);
+            driveRightA.set(ControlMode.PercentOutput,0.75);
+            driveRightB.set(ControlMode.PercentOutput,0.75);
           }
         }
 
@@ -428,16 +429,51 @@ public class Robot extends TimedRobot {
     driveRightA.set(ControlMode.PercentOutput,driveRightPower);
     driveRightB.set(ControlMode.PercentOutput,driveRightPower);
 
+    // if(driverController.getRawButton(5)){
+    //   intake.set(TalonSRXControlMode.PercentOutput, 1);
+    // }
+    // else if(driverController.getRawButton(6)){
+    //   intake.set(TalonSRXControlMode.PercentOutput, -1);
+    // }
+    // else
+    // {
+    //   intake.set(TalonSRXControlMode.PercentOutput, 0);
+    //}
     // //Intake controls
-    if(driverController.getRawButton(5)){
-      intake.set(TalonSRXControlMode.PercentOutput, 1);;
+    if (!toggle)
+    {
+      if(driverController.getRawAxis(2) > 0.5){
+        intake.set(TalonSRXControlMode.PercentOutput, 1);
+      }
+      else if(driverController.getRawButton(6)){
+        intake.set(TalonSRXControlMode.PercentOutput, -1);
+      }
+      else
+      {
+        intake.set(TalonSRXControlMode.PercentOutput, 0);
+      }
+   }
+
+    
+    if (driverController.getRawButtonPressed(5))
+    {
+      
+      if (!toggle)
+      {
+        intake.set(TalonSRXControlMode.PercentOutput, 0);
+        intake.set(TalonSRXControlMode.PercentOutput, 1);
+        toggle = true;
+      }
+      else
+      {
+        intake.set(TalonSRXControlMode.PercentOutput, 0);
+        toggle = false;
+      }
+      
     }
-    else if(driverController.getRawButton(6)){
-      intake.set(TalonSRXControlMode.PercentOutput, -1);
-    }
-    else{
-      intake.set(TalonSRXControlMode.PercentOutput, 0);
-    }
+  
+      
+    // }
 
     //Arm Controls
     if(armUp){
@@ -466,7 +502,7 @@ public class Robot extends TimedRobot {
       armUp = false;
     }  
 
-  }
+}
 
   @Override
   public void disabledInit() {
